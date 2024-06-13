@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Checklist App',
+      title: 'Triopt Checklist',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -60,7 +60,7 @@ class GuestListScreen extends StatelessWidget {
             padding: EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
-                labelText: 'Search Guest',
+                labelText: 'Gäste Suchen',
                 border: OutlineInputBorder(),
               ),
               onChanged: (query) {

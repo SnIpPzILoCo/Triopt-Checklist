@@ -46,7 +46,7 @@ class GuestListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Guest List'),
+        title: Text('Checklist'),
         actions: [
           IconButton(
             icon: Icon(Icons.upload_file),

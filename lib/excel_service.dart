@@ -25,8 +25,9 @@ class ExcelService {
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Sheet1'];
 
-    for (var guest in guests) {
-      sheetObject.appendRow([guest.name]);
+    for (var i = 0; i < guests.length; i++) {
+      var cell = sheetObject.cell(CellIndex.indexByString('A$i'));
+      cell.value = TextCellValue(guests[i].toString());
     }
 
     var bytes = excel.encode();
@@ -40,7 +41,7 @@ class ExcelService {
     final byteData = await rootBundle.load(path);
     final bytes = byteData.buffer.asUint8List();
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/guest_list.xlsx');
+    final file = File('${directory.path}/test.xlsx');
     await file.writeAsBytes(bytes, flush: true);
     return file;
   }

@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Checklist App',
+      title: 'Triopt Checklist App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -41,7 +41,6 @@ class GuestListScreen extends StatelessWidget {
     final guests = await excelService.readGuestsFromExcel(file);
     context.read<GuestProvider>().setGuests(guests);
   }
-
   Future<void> exportGuests(BuildContext context) async {
     final guests = context.read<GuestProvider>().guests;
     final file = await excelService.exportGuestsToExcel(guests);
@@ -49,21 +48,22 @@ class GuestListScreen extends StatelessWidget {
       SnackBar(content: Text('Exported to: ${file.path}')),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guest List'),
+        title: const Text('Triopt Checklist'),
         actions: [
           IconButton(
             icon: const Icon(Icons.upload_file),
             onPressed: () => importGuests(context),
           ),
+          /*
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () => exportGuests(context),
-          ),
+            ),
+            */
         ],
       ),
       body: Column(
@@ -72,7 +72,7 @@ class GuestListScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: const InputDecoration(
-                labelText: 'Search Guest',
+                labelText: 'Suche',
                 border: OutlineInputBorder(),
               ),
               onChanged: (query) {

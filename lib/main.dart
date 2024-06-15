@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'guest_provider.dart';
 import 'excel_service.dart';
 
-//TODO: Make Site prettier(Menu, Animations, Centering, Import/Export buttons etc.).
-//TODO: Ignore or Solve Messages.
 void main() {
   runApp(
     MultiProvider(
@@ -22,31 +20,42 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Checklist App',
+      title: 'Triopt Checklist App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: GuestListScreen(),
+      home: const GuestListScreen(),
     );
   }
 }
 
-class GuestListScreen extends StatelessWidget {
+class GuestListScreen extends StatefulWidget {
+  const GuestListScreen({super.key});
+
+  @override
+  _GuestListScreenState createState() => _GuestListScreenState();
+}
+
+class _GuestListScreenState extends State<GuestListScreen> {
   final ExcelService excelService = ExcelService();
 
-  GuestListScreen({super.key});
-
-  Future<void> importGuests(BuildContext context) async {
-    final file = await excelService.getAssetExcelFile('assets/test.xlsx');
-    final guests = await excelService.readGuestsFromExcel(file);
-    context.read<GuestProvider>().setGuests(guests);
+  @override
+  void initState() {
+    super.initState();
+    loadGuests();
   }
 
-  Future<void> exportGuests(BuildContext context) async {
-    final guests = context.read<GuestProvider>().guests;
-    final file = await excelService.exportGuestsToExcel(guests);
+  Future<void> loadGuests() async {
+    final file = await excelService.getAssetExcelFile('assets/test.xlsx');
+    final guests = await excelService.readGuestsFromExcel(file);
+    Provider.of<GuestProvider>(context, listen: false).setGuests(guests);
+  }
+
+  Future<void> exportGuests() async {
+    final guests = Provider.of<GuestProvider>(context, listen: false).guests;
+    await excelService.exportGuestsToExcel(guests);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Exported to: ${file.path}')),
+      const SnackBar(content: Text('Export Completed')),
     );
   }
 
@@ -54,15 +63,11 @@ class GuestListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guest List'),
+        title: const Text('Gästeliste'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.upload_file),
-            onPressed: () => importGuests(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.download),
-            onPressed: () => exportGuests(context),
+            onPressed: exportGuests,
           ),
         ],
       ),
@@ -72,11 +77,11 @@ class GuestListScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: const InputDecoration(
-                labelText: 'Search Guest',
+                labelText: 'Suche',
                 border: OutlineInputBorder(),
               ),
               onChanged: (query) {
-                context.read<GuestProvider>().searchGuests(query);
+                Provider.of<GuestProvider>(context, listen: false).searchGuests(query);
               },
             ),
           ),
@@ -84,12 +89,55 @@ class GuestListScreen extends StatelessWidget {
             child: Consumer<GuestProvider>(
               builder: (context, guestProvider, child) {
                 return ListView.builder(
-                  itemCount: guestProvider.guests.length,
+                  itemCount: guestProvider.guests.length + 1, // +1 for the title row
                   itemBuilder: (context, index) {
-                    final guest = guestProvider.guests[index];
-                    return ListTile(
-                      title: Text(guest.name),
-                    );
+                    if (index == 0) {
+                      return const ListTile(
+                        title: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Gast',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  'Anwesend',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      final guest = guestProvider.guests[index - 1];
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text(guest.name),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Checkbox(
+                                  value: guest.isChecked,
+                                  onChanged: (bool? value) {
+                                    guestProvider.toggleGuestCheck(index - 1);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                   },
                 );
               },

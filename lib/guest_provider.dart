@@ -7,21 +7,14 @@ class GuestProvider with ChangeNotifier {
 
   List<Guest> get guests => _filteredGuests;
 
-  void addGuest(Guest guest) {
-    _guests.add(guest);
-    _filteredGuests = List.from(_guests);
-    notifyListeners();
-  }
-
   void setGuests(List<Guest> guests) {
     _guests = guests;
     _filteredGuests = List.from(_guests);
     notifyListeners();
   }
 
-  void clearGuests() {
-    _guests.clear();
-    _filteredGuests.clear();
+  void toggleGuestCheck(int index) {
+    _filteredGuests[index].isChecked = !_filteredGuests[index].isChecked;
     notifyListeners();
   }
 

@@ -36,8 +36,8 @@ class ExcelService {
 
     // Add the title row
     sheetObject.appendRow([
-      const TextCellValue('Gast'),
-      const TextCellValue('Anwesend'),
+      const TextCellValue('Guest Name'),
+      const TextCellValue('Checked'),
     ]);
 
     for (var guest in guests) {
@@ -53,8 +53,8 @@ class ExcelService {
     if (await Permission.storage.request().isGranted) {
       // Prompt user to select a file location to save the exported file
       String? outputPath = await FilePicker.platform.saveFile(
-        dialogTitle: 'Als Excel Tabelle abspeichern',
-        fileName: 'test.xlsx',
+        dialogTitle: 'Save Excel File',
+        fileName: 'guest_list.xlsx',
         type: FileType.custom,
         allowedExtensions: ['xlsx'],
       );
@@ -73,7 +73,7 @@ class ExcelService {
     final byteData = await rootBundle.load(path);
     final bytes = byteData.buffer.asUint8List();
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/test.xlsx');
+    final file = File('${directory.path}/guest_list.xlsx');
     await file.writeAsBytes(bytes, flush: true);
     return file;
   }

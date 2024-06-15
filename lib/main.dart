@@ -20,8 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Triopt Checklist App',
-      title: 'Triopt Checklist App',
+      title: 'Checklist App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -47,18 +46,19 @@ class _GuestListScreenState extends State<GuestListScreen> {
   }
 
   Future<void> loadGuests() async {
-    final file = await excelService.getAssetExcelFile('assets/test.xlsx');
+    final file = await excelService.getAssetExcelFile('assets/guest_list.xlsx');
     final guests = await excelService.readGuestsFromExcel(file);
     Provider.of<GuestProvider>(context, listen: false).setGuests(guests);
   }
 
-  Future<void> exportGuests(BuildContext context) async {
-    final guests = context.read<GuestProvider>().guests;
-    final file = await excelService.exportGuestsToExcel(guests);
+  Future<void> exportGuests() async {
+    final guests = Provider.of<GuestProvider>(context, listen: false).guests;
+    await excelService.exportGuestsToExcel(guests);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Export Completed')),
+      const SnackBar(content: Text('Export completed')),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,12 +66,8 @@ class _GuestListScreenState extends State<GuestListScreen> {
         title: const Text('Guest List'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.upload_file),
-            onPressed: () => importGuests(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.download),
-            onPressed: () => exportGuests(context),
+            onPressed: exportGuests,
           ),
         ],
       ),
@@ -81,7 +77,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: const InputDecoration(
-                labelText: 'Suche',
+                labelText: 'Search Guest',
                 border: OutlineInputBorder(),
               ),
               onChanged: (query) {
@@ -102,7 +98,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
                             Expanded(
                               flex: 2,
                               child: Text(
-                                'Gast',
+                                'Guest Name',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -110,7 +106,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
                               flex: 1,
                               child: Center(
                                 child: Text(
-                                  'Anwesend',
+                                  'Checked',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),

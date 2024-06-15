@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: '>=3.4.3'
 
 dependencies:
   flutter:
@@ -17,6 +17,11 @@ dependencies:
   permission_handler: ^11.3.1
 
 
+<<<<<<< HEAD
+=======
+  excel: any
+  mint: ^0.6.1
+>>>>>>> 34816cc29d05249464ef90cf64475e520884ba35
 dev_dependencies:
   flutter_test:
     sdk: flutter

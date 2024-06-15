@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Triopt Checklist App',
+      title: 'Triopt Checklist App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -51,23 +52,26 @@ class _GuestListScreenState extends State<GuestListScreen> {
     Provider.of<GuestProvider>(context, listen: false).setGuests(guests);
   }
 
-  Future<void> exportGuests() async {
-    final guests = Provider.of<GuestProvider>(context, listen: false).guests;
-    await excelService.exportGuestsToExcel(guests);
+  Future<void> exportGuests(BuildContext context) async {
+    final guests = context.read<GuestProvider>().guests;
+    final file = await excelService.exportGuestsToExcel(guests);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Export Completed')),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gästeliste'),
+        title: const Text('Guest List'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.upload_file),
+            onPressed: () => importGuests(context),
+          ),
+          IconButton(
             icon: const Icon(Icons.download),
-            onPressed: exportGuests,
+            onPressed: () => exportGuests(context),
           ),
         ],
       ),

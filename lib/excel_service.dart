@@ -51,7 +51,7 @@ class ExcelService {
 
     var status = await Permission.manageExternalStorage.request();
     // Request permissions
-    if (await status.isGranted) {
+    if (status.isGranted) {
       // Prompt user to select a file location to save the exported file
       String? outputPath = await FilePicker.platform.saveFile(
         dialogTitle: 'Liste Speichern',

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Checklist App',
+      title: 'Triopt Cheklist App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -46,7 +46,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
   }
 
   Future<void> loadGuests() async {
-    final file = await excelService.getAssetExcelFile('assets/guest_list.xlsx');
+    final file = await excelService.getAssetExcelFile('assets/test.xlsx');
     final guests = await excelService.readGuestsFromExcel(file);
     Provider.of<GuestProvider>(context, listen: false).setGuests(guests);
   }
@@ -55,7 +55,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
     final guests = Provider.of<GuestProvider>(context, listen: false).guests;
     await excelService.exportGuestsToExcel(guests);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Export completed')),
+      const SnackBar(content: Text('Export fertig')),
     );
   }
 
@@ -63,7 +63,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guest List'),
+        title: const Text('Triopt Checklist'),
         actions: [
           IconButton(
             icon: const Icon(Icons.download),
@@ -77,7 +77,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: const InputDecoration(
-                labelText: 'Search Guest',
+                labelText: 'Suche',
                 border: OutlineInputBorder(),
               ),
               onChanged: (query) {
@@ -98,7 +98,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
                             Expanded(
                               flex: 2,
                               child: Text(
-                                'Guest Name',
+                                'Gast',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -106,7 +106,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
                               flex: 1,
                               child: Center(
                                 child: Text(
-                                  'Checked',
+                                  'Anwesend',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),

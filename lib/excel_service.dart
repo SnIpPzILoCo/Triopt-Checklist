@@ -36,8 +36,8 @@ class ExcelService {
 
     // Add the title row
     sheetObject.appendRow([
-      const TextCellValue('Guest Name'),
-      const TextCellValue('Checked'),
+      const TextCellValue('Gast'),
+      const TextCellValue('Anwesend'),
     ]);
 
     for (var guest in guests) {
@@ -49,12 +49,13 @@ class ExcelService {
 
     var bytes = excel.encode()!;
 
+    var status = await Permission.manageExternalStorage.request();
     // Request permissions
-    if (await Permission.storage.request().isGranted) {
+    if (await status.isGranted) {
       // Prompt user to select a file location to save the exported file
       String? outputPath = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save Excel File',
-        fileName: 'guest_list.xlsx',
+        dialogTitle: 'Liste Speichern',
+        fileName: 'export.xlsx',
         type: FileType.custom,
         allowedExtensions: ['xlsx'],
       );
@@ -73,7 +74,7 @@ class ExcelService {
     final byteData = await rootBundle.load(path);
     final bytes = byteData.buffer.asUint8List();
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/guest_list.xlsx');
+    final file = File('${directory.path}/test.xlsx');
     await file.writeAsBytes(bytes, flush: true);
     return file;
   }

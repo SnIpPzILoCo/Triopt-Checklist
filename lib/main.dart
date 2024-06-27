@@ -48,15 +48,27 @@ class _GuestListScreenState extends State<GuestListScreen> {
   Future<void> loadGuests() async {
     final file = await excelService.getAssetExcelFile('assets/test.xlsx');
     final guests = await excelService.readGuestsFromExcel(file);
-    Provider.of<GuestProvider>(context, listen: false).setGuests(guests);
+    if (mounted) {
+      Provider.of<GuestProvider>(context, listen: false).setGuests(guests);
+    }
   }
 
   Future<void> exportGuests() async {
-    final guests = Provider.of<GuestProvider>(context, listen: false).guests;
-    await excelService.exportGuestsToExcel(guests);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Export fertig')),
-    );
+    try {
+      final guests = Provider.of<GuestProvider>(context, listen: false).guests;
+      await excelService.exportGuestsToExcel(context, guests);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Export fertig')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Fehler beim Export: $e')),
+        );
+      }
+    }
   }
 
   @override

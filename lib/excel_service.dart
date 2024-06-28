@@ -66,9 +66,6 @@ class ExcelService {
           fsType: FilesystemType.folder,
           pickText: 'Save file to this folder',
         );
-        if (outputPath != null) {
-          final file = File('$outputPath/export.xlsx');
-          await file.writeAsBytes(bytes, flush: true);
         }
       } else {
         // Handle permission denied

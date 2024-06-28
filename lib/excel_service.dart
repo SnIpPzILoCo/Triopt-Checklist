@@ -1,5 +1,4 @@
 import 'package:excel/excel.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'guest.dart';
@@ -7,10 +6,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:downloadsfolder/downloadsfolder.dart';
 
 class ExcelService {
   Future<List<Guest>> readGuestsFromExcel(File file) async {
-    final bytes = await file.readAsBytes(); // Use async read
+    final bytes = await file.readAsBytes();
     final excel = Excel.decodeBytes(bytes);
     List<Guest> guests = [];
 
@@ -20,12 +20,12 @@ class ExcelService {
       for (var row in sheet!.rows) {
         if (isFirstRow) {
           isFirstRow = false;
-          continue; // Skip the first row (headline)
+          continue;
         }
         guests.add(Guest(
           name: row[0]?.value.toString() ?? '',
           isChecked:
-              (row[1]?.value ?? 'false').toString().toLowerCase() == 'true',
+              (row[1]?.value ?? 'FALSE').toString().toLowerCase() == 'TRUE',
         ));
       }
     }
@@ -33,11 +33,11 @@ class ExcelService {
     return guests;
   }
 
-  Future<void> exportGuestsToExcel(BuildContext context, List<Guest> guests) async {
+  Future<Directory> exportGuestsToExcel(
+      BuildContext context, List<Guest> guests) async {
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Sheet1'];
 
-    // Add the title row
     sheetObject.appendRow([
       const TextCellValue('Gast'),
       const TextCellValue('Anwesend'),
@@ -46,52 +46,36 @@ class ExcelService {
     for (var guest in guests) {
       sheetObject.appendRow([
         TextCellValue(guest.name),
-        TextCellValue(guest.isChecked ? 'true' : 'false'),
+        TextCellValue(guest.isChecked ? 'TRUE' : 'FALSE'),
       ]);
     }
 
     var bytes = excel.encode()!;
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    var directory = await getDownloadDirectory();
 
-    // Request permissions
-    if (androidInfo.version.sdkInt.toInt() <= 29) {
-      var status2 = await Permission.storage.request();
-      if (status2.isGranted) {
-        // Prompt user to select a file location to save the exported file
-        String? outputPath = await FilesystemPicker.open(
-          title: 'Save to folder',
-          context: context,
-          rootDirectory: Directory('/storage/emulated/0'), // Example root directory
-          fsType: FilesystemType.folder,
-          pickText: 'Save file to this folder',
-        );
-        }
+    if (androidInfo.version.sdkInt.toInt() <= 32) {
+      var status = await Permission.storage.request();
+
+      if (status.isGranted) {
+        final file = File('${directory.path}/export.xlsx');
+        await file.writeAsBytes(bytes, flush: true);
       } else {
-        // Handle permission denied
         throw Exception("Storage permission denied");
       }
-    } else if (androidInfo.version.sdkInt.toInt() >= 30) {
+    } else if (androidInfo.version.sdkInt.toInt() >= 33) {
       var status = await Permission.manageExternalStorage.request();
 
       if (status.isGranted) {
-        // Prompt user to select a file location to save the exported file
-        String? outputPath = await FilesystemPicker.open(
-          title: 'Save to folder',
-          context: context,
-          rootDirectory: Directory('/storage/emulated/0'), // Example root directory
-          fsType: FilesystemType.folder,
-          pickText: 'Save file to this folder',
-        );
-        if (outputPath != null) {
-          final file = File('$outputPath/export.xlsx');
-          await file.writeAsBytes(bytes, flush: true);
-        }
+        final file = File('${directory.path}/export.xlsx');
+        await file.writeAsBytes(bytes, flush: true);
       } else {
-        // Handle permission denied
         throw Exception("Storage permission denied");
       }
     }
+
+    return directory;
   }
 
   Future<File> getAssetExcelFile(String path) async {

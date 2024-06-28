@@ -23,7 +23,8 @@ class GuestProvider with ChangeNotifier {
       _filteredGuests = List.from(_guests);
     } else {
       _filteredGuests = _guests
-          .where((guest) => guest.name.toLowerCase().contains(query.toLowerCase()))
+          .where(
+              (guest) => guest.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
     }
     notifyListeners();

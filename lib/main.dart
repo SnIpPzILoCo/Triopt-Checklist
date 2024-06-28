@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Triopt Cheklist App',
+      title: 'Triopt Checklist App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -56,10 +56,11 @@ class _GuestListScreenState extends State<GuestListScreen> {
   Future<void> exportGuests() async {
     try {
       final guests = Provider.of<GuestProvider>(context, listen: false).guests;
-      await excelService.exportGuestsToExcel(context, guests);
+      final directory = await excelService.exportGuestsToExcel(context, guests);
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Export fertig')),
+          SnackBar(content: Text('Exportiert nach: ${directory.path}/export.xlsx')),
         );
       }
     } catch (e) {
@@ -70,7 +71,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
       }
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +94,8 @@ class _GuestListScreenState extends State<GuestListScreen> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (query) {
-                Provider.of<GuestProvider>(context, listen: false).searchGuests(query);
+                Provider.of<GuestProvider>(context, listen: false)
+                    .searchGuests(query);
               },
             ),
           ),
@@ -101,7 +103,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
             child: Consumer<GuestProvider>(
               builder: (context, guestProvider, child) {
                 return ListView.builder(
-                  itemCount: guestProvider.guests.length + 1, // +1 for the title row
+                  itemCount: guestProvider.guests.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return const ListTile(

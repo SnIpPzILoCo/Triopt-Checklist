@@ -19,10 +19,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const Color seedColor = Colors.blue; // Define your seed color here
+
     return MaterialApp(
       title: 'Triopt Checklist App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: seedColor),
+        appBarTheme: AppBarTheme(
+          backgroundColor: ColorScheme.fromSeed(seedColor: seedColor).primary,
+          titleTextStyle: TextStyle(
+            color: ColorScheme.fromSeed(seedColor: seedColor).onPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: const OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: ColorScheme.fromSeed(seedColor: seedColor).primary),
+          ),
+          labelStyle: TextStyle(
+              color: ColorScheme.fromSeed(seedColor: seedColor).primary),
+        ),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.selected)) {
+                return Colors.green;
+              }
+              return Colors.white; // Use a different color when not selected
+            },
+          ),
+        ),
       ),
       home: const GuestListScreen(),
     );
@@ -57,10 +87,11 @@ class _GuestListScreenState extends State<GuestListScreen> {
     try {
       final guests = Provider.of<GuestProvider>(context, listen: false).guests;
       final directory = await excelService.exportGuestsToExcel(context, guests);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Exportiert nach: ${directory.path}/export.xlsx')),
+          SnackBar(
+              content: Text('Exportiert nach: ${directory.path}/export.xlsx')),
         );
       }
     } catch (e) {
@@ -71,15 +102,17 @@ class _GuestListScreenState extends State<GuestListScreen> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Triopt Checklist'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.download),
+            icon: const Icon(Icons.download, color: Colors.white),
             onPressed: exportGuests,
           ),
         ],
@@ -89,9 +122,13 @@ class _GuestListScreenState extends State<GuestListScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Suche',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: colorScheme.primary),
+                ),
+                labelStyle: TextStyle(color: colorScheme.primary),
               ),
               onChanged: (query) {
                 Provider.of<GuestProvider>(context, listen: false)
@@ -106,14 +143,17 @@ class _GuestListScreenState extends State<GuestListScreen> {
                   itemCount: guestProvider.guests.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      return const ListTile(
+                      return ListTile(
                         title: Row(
                           children: [
                             Expanded(
                               flex: 2,
                               child: Text(
                                 'Gast',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.primary,
+                                ),
                               ),
                             ),
                             Expanded(
@@ -121,7 +161,10 @@ class _GuestListScreenState extends State<GuestListScreen> {
                               child: Center(
                                 child: Text(
                                   'Anwesend',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                               ),
                             ),
@@ -135,7 +178,10 @@ class _GuestListScreenState extends State<GuestListScreen> {
                           children: [
                             Expanded(
                               flex: 2,
-                              child: Text(guest.name),
+                              child: Text(
+                                guest.name,
+                                style: TextStyle(color: colorScheme.onSurface),
+                              ),
                             ),
                             Expanded(
                               flex: 1,
@@ -150,6 +196,9 @@ class _GuestListScreenState extends State<GuestListScreen> {
                             ),
                           ],
                         ),
+                        tileColor: index % 2 == 0
+                            ? colorScheme.primaryContainer.withOpacity(0.1)
+                            : colorScheme.secondaryContainer.withOpacity(0.1),
                       );
                     }
                   },
